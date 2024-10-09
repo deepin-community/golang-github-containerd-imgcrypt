@@ -1,4 +1,7 @@
 #!/usr/bin/make -f
 
 %:
-	dh $@
+	dh $@ --builddirectory=_build --buildsystem=golang
+
+execute_after_dh_auto_install:
+	mv -v debian/tmp/usr/bin/ctr debian/tmp/usr/bin/ctr-imgcrypt

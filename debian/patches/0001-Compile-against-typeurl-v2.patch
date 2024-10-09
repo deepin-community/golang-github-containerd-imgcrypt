@@ -1,0 +1,90 @@
+From: Reinhard Tartler <siretart@tauware.de>
+Date: Sat, 27 Jul 2024 12:50:14 +0200
+Subject: Compile against typeurl/v2
+
+---
+ cmd/ctd-decoder/main.go                   | 2 +-
+ cmd/ctr/commands/containers/containers.go | 4 ++--
+ images/encryption/client.go               | 2 +-
+ images/encryption/payload_test.go         | 6 ------
+ payload.go                                | 2 +-
+ 5 files changed, 5 insertions(+), 11 deletions(-)
+
+diff --git a/cmd/ctd-decoder/main.go b/cmd/ctd-decoder/main.go
+index 8b56ff0..9473c2b 100644
+--- a/cmd/ctd-decoder/main.go
++++ b/cmd/ctd-decoder/main.go
+@@ -23,7 +23,7 @@ import (
+ 
+ 	"github.com/containerd/imgcrypt"
+ 	"github.com/containerd/imgcrypt/images/encryption"
+-	"github.com/containerd/typeurl"
++	"github.com/containerd/typeurl/v2"
+ 
+ 	"github.com/gogo/protobuf/proto"
+ 	"github.com/gogo/protobuf/types"
+diff --git a/cmd/ctr/commands/containers/containers.go b/cmd/ctr/commands/containers/containers.go
+index 76af69e..0cb3edb 100644
+--- a/cmd/ctr/commands/containers/containers.go
++++ b/cmd/ctr/commands/containers/containers.go
+@@ -31,7 +31,7 @@ import (
+ 	"github.com/containerd/containerd/log"
+ 	"github.com/containerd/imgcrypt/cmd/ctr/commands/flags"
+ 	"github.com/containerd/imgcrypt/cmd/ctr/commands/run"
+-	"github.com/containerd/typeurl"
++	"github.com/containerd/typeurl/v2"
+ 	"github.com/urfave/cli"
+ )
+ 
+@@ -281,7 +281,7 @@ var infoCommand = cli.Command{
+ 			return nil
+ 		}
+ 
+-		if info.Spec != nil && info.Spec.Value != nil {
++		if info.Spec != nil && info.Spec.GetValue() != nil {
+ 			v, err := typeurl.UnmarshalAny(info.Spec)
+ 			if err != nil {
+ 				return err
+diff --git a/images/encryption/client.go b/images/encryption/client.go
+index b3495ac..7564fbf 100644
+--- a/images/encryption/client.go
++++ b/images/encryption/client.go
+@@ -25,7 +25,7 @@ import (
+ 	"github.com/containerd/containerd/diff"
+ 	"github.com/containerd/containerd/errdefs"
+ 	"github.com/containerd/imgcrypt"
+-	"github.com/containerd/typeurl"
++	"github.com/containerd/typeurl/v2"
+ 
+ 	encconfig "github.com/containers/ocicrypt/config"
+ 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+diff --git a/images/encryption/payload_test.go b/images/encryption/payload_test.go
+index e318a63..bf69c2d 100644
+--- a/images/encryption/payload_test.go
++++ b/images/encryption/payload_test.go
+@@ -23,12 +23,6 @@ import (
+ 	"github.com/gogo/protobuf/types"
+ )
+ 
+-func TestInit(t *testing.T) {
+-	if !processorPayloadsUseGogo {
+-		t.Fatalf("failed to detect gogo: %v", processorPayloadsUseGogo)
+-	}
+-}
+-
+ func TestClear(t *testing.T) {
+ 	var ac diff.ApplyConfig
+ 	clearProcessorPayloads(&ac)
+diff --git a/payload.go b/payload.go
+index 0c8a48f..6699d5b 100644
+--- a/payload.go
++++ b/payload.go
+@@ -17,7 +17,7 @@
+ package imgcrypt
+ 
+ import (
+-	"github.com/containerd/typeurl"
++	"github.com/containerd/typeurl/v2"
+ 
+ 	encconfig "github.com/containers/ocicrypt/config"
+ 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
